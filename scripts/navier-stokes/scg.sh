@@ -1,0 +1,3 @@
+python main.py pretrain=navier-stokes problem=navier-stokes_ds8 algorithm=scg exp_name=sigma0-512 problem.model.sigma_noise=0.0 algorithm.method.num_candidates=512
+python main.py pretrain=navier-stokes problem=navier-stokes_ds8 algorithm=scg exp_name=sigma1-512 problem.model.sigma_noise=1.0 algorithm.method.num_candidates=512
+python main.py pretrain=navier-stokes problem=navier-stokes_ds8 algorithm=scg exp_name=sigma2-512 problem.model.sigma_noise=2.0 algorithm.method.num_candidates=512

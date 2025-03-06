@@ -1,0 +1,1 @@
+python main.py pretrain=navier-stokes problem=navier-stokes_ds2 algorithm=eki problem.data.id_list=0-4 exp_name=sigma0 wandb=True
