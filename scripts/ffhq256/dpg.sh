@@ -1,3 +1,0 @@
-# python main.py problem=ffhq256_inpaint pretrain=ffhq256 algorithm=dpg 
-CUDA_VISIBLE_DEVICES=2 python main.py problem=ffhq256_sr pretrain=ffhq256 algorithm=dpg algorithm.method.guidance_scale=160.0 algorithm.method.num_mc_samples=800 algorithm.method.batch_size=200
-CUDA_VISIBLE_DEVICES=2 python main.py problem=ffhq256_deblur pretrain=ffhq256 algorithm=dpg algorithm.method.guidance_scale=200.0 algorithm.method.num_mc_samples=800 algorithm.method.batch_size=200
