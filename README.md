@@ -7,14 +7,14 @@ Hongkai Zheng*, Wenda Chu*, Bingliang Zhang*, Zihui Wu*, Austin Wang, Berthy T. 
 (*: Equal contribution)
 
 Abstract: *Plug-and-play diffusion priors (PnPDP) have emerged as a promising research direction for solving inverse problems. 
- However, current studies primarily focus on natural image restoration, leaving the performance of these algorithms in scientific inverse problems largely unexplored. To address this gap, we introduce \textsc{InverseBench}, a framework that evaluates diffusion models across five distinct scientific inverse problems. These problems present unique structural challenges that differ from existing benchmarks, arising from critical scientific applications such as optical tomography, medical imaging, black hole imaging, seismology, and fluid dynamics. With \textsc{InverseBench}, we benchmark 14 inverse problem algorithms that use plug-and-play diffusion priors against strong, domain-specific baselines, offering valuable new insights into the strengths and weaknesses of existing algorithms.*
+ However, current studies primarily focus on natural image restoration, leaving the performance of these algorithms in scientific inverse problems largely unexplored. To address this gap, we introduce **InverseBench**, a framework that evaluates diffusion models across five distinct scientific inverse problems. These problems present unique structural challenges that differ from existing benchmarks, arising from critical scientific applications such as optical tomography, medical imaging, black hole imaging, seismology, and fluid dynamics. With **InverseBench**, we benchmark 14 inverse problem algorithms that use plug-and-play diffusion priors against strong, domain-specific baselines, offering valuable new insights into the strengths and weaknesses of existing algorithms.*
 ![](assets/teaser.png)
 
 ## Environment requirements
 - We recommend Linux with 64-bit Python 3.11.5 for the best compatiblity.
 - At least one high-end GPU for inference. All our experiments were conducted on A100 GPUs. 
-- The main dependencies are `pytorch, scipy, hydra-core, lmdb, piq, wandb, accelerate, devito, dask, ehtim, ehtplot, h5py, sigpy`. 
-- We also provide [Dockerfile](Docker/Dockerfile) is provided under `Docker`, which can be used as follows:
+- The main dependencies are `pytorch, scipy, hydra-core, lmdb, piq, wandb, accelerate, devito, dask, ehtim, ehtplot, h5py, sigpy, pynfft, pytest`. Note that `pynfft` is required for the black hole imaging task and is compatible only with `numpy 1.xx`.
+- We also provide [Dockerfile](Docker/Dockerfile) is provided under `Docker`, offering the best compatibility for all five tasks. It can be used as follows:
 ```bash
 # Build docker image
 docker build -t [image tag] --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) .
