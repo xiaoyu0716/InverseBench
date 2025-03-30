@@ -39,13 +39,14 @@ class FPS(Algo):
         # NOTE: This implementation transforms linear inverse problems to its equivalent form of inpainting in the space of SVD.
         device = self.forward_op.device
         
-        sigma_y = self.forward_op.sigma_noise
-        sigma_y = max(sigma_y, 1e-3)
-        observation_t = self.forward_op.Ut(observation)
+        observation = observation / self.forward_op.unnorm_scale - self.forward_op.forward(self.forward_op.unnorm_shift * torch.ones(observation.shape[0], self.net.img_channels, self.net.img_resolution, self.net.img_resolution, device=device),unnormalize=False)
+
+        sigma_y = self.forward_op.sigma_noise / self.forward_op.unnorm_scale
+        sigma_y = max(sigma_y, 1e-4)
+        observation_t = self.forward_op.Ut(observation) / self.forward_op.S
         # 1. Generate y sequence (Algorithm 2)
         
         observations = []
-        # z = torch.randn(observation.shape[0], self.net.img_channels, self.net.img_resolution, self.net.img_resolution, device=device) * self.scheduler.sigma_max
         z = torch.randn(observation.shape[0], *self.forward_op.M.shape, device=device) * self.scheduler.sigma_max
         y = self.forward_op.M * z
         observations.append(y * self.scheduler.scaling_steps[0])
@@ -60,11 +61,10 @@ class FPS(Algo):
         pbar = tqdm.trange(self.scheduler.num_steps)
         for step in pbar:
             sigma, sigma_next = self.scheduler.sigma_steps[step], self.scheduler.sigma_steps[step + 1]
-            x = self.forward_op.V(x_t)
+            x = self.forward_op.V(x_t.flatten(0,1))
 
-            x0 = self.net(x.flatten(0,1)/self.scheduler.scaling_steps[step], torch.as_tensor(sigma).to(x.device)).view\
-                (observation.shape[0], self.num_particles, self.net.img_channels, self.net.img_resolution, self.net.img_resolution)
-            x0 = self.forward_op.S*self.forward_op.Vt(x0)
+            x0 = self.net(x/self.scheduler.scaling_steps[step], torch.as_tensor(sigma).to(x.device))
+            x0 = self.forward_op.Vt(x0).view(-1, self.num_particles, *x_t.shape[2:])
             x_next_t =  x0 + np.sqrt(1 - self.eta**2) * sigma_next / sigma * (x_t - x0)
 
             variance = (1/self.eta ** 2 / sigma_next ** 2 + self.forward_op.M / sigma_y ** 2 / self.scheduler.scaling_steps[step+1] ** 2) ** -1
@@ -81,6 +81,6 @@ class FPS(Algo):
             for i in range(samples.shape[0]):
                 x_ts.append(x_t[i,samples[i,:]])
             x_t = torch.stack(x_ts, dim=0)
-        return self.forward_op.V(x_t[:,0])
+        return self.forward_op.V(x_t.squeeze(0))
 
 

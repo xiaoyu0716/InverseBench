@@ -260,3 +260,32 @@ class MRI(Evaluator):
         return metric_dict
 
 
+
+class InverseScatter(Evaluator):
+    def __init__(self, forward_op=None):
+        self.eval_batch = 32
+        metric_list = {'psnr': lambda x, y: psnr(x.clip(0, 1), y.clip(0, 1), data_range=1.0, reduction='none'),
+                       'ssim': lambda x, y: ssim(x.clip(0, 1), y.clip(0, 1), data_range=1.0, reduction='none')}
+        super(InverseScatter, self).__init__(metric_list, forward_op=forward_op)
+
+    def __call__(self, pred, target, observation=None):
+        '''
+        Args:
+            - pred (torch.Tensor): (N, C, H, W)
+            - target (torch.Tensor): (C, H, W) or (N, C, H, W)
+        Returns:
+            - metric_dict (Dict): a dictionary of metric values
+        '''
+        
+        metric_dict = {}
+        for metric_name, metric_func in self.metric_list.items():
+            if pred.shape != target.shape:
+                val = metric_func(pred, target.repeat(pred.shape[0],1,1,1)).mean().item()
+                metric_dict[metric_name] = val
+                self.metric_state[metric_name].append(val)
+            else:
+                val = metric_func(pred, target).mean().item()
+                metric_dict[metric_name] = val
+                self.metric_state[metric_name].append(val)
+        return metric_dict
+    

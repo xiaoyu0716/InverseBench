@@ -3,7 +3,7 @@ from .base import BaseOperator
 from scipy.special import hankel1
 from scipy.integrate import dblquad
 import numpy as np
-
+import os
 def A_adjoint(z, f, g, dx, dy):
     """
     Adjoint of A = I - G*diag(f) operator required for forward scattering
@@ -364,17 +364,23 @@ def full_propagate_to_sensor(f, utot_dom_set, sensor_greens_function_set, dx, dy
 class InverseScatter(BaseOperator):
     
     def __init__(self, Lx=0.18, Ly=0.18, Nx=128, Ny=128, wave=6, 
-                 numRec=360, numTrans=60, sensorRadius=1.6, **kwargs):
+                 numRec=360, numTrans=60, sensorRadius=1.6, svd=True, **kwargs):
         super(InverseScatter, self).__init__(**kwargs)
         self.Nx = Nx
         self.Ny = Ny
         self.dx = Lx / Nx
         self.dy = Ly / Ny
+        self.numRec = numRec
+        self.numTrans = numTrans
         self.domain_greens_function_set, self.sensor_greens_function_set, self.uinc_dom_set, self.receiver_mask_set = \
         construct_parameters(Lx, Ly, Nx, Ny, wave, numRec, numTrans, sensorRadius, self.device)
         
-        self.sensor_greens_function_set = self.sensor_greens_function_set.to(torch.complex64)   # (Ny x Nx x numRec)
-        self.uinc_dom_set = self.uinc_dom_set.to(torch.complex64)   # (Ny x Nx x numTrans)
+        self.sensor_greens_function_set = self.sensor_greens_function_set.to(torch.complex128)   # (Ny x Nx x numRec)
+        self.uinc_dom_set = self.uinc_dom_set.to(torch.complex128)   # (Ny x Nx x numTrans)
+
+        if svd:
+            self.compute_svd()
+
         
     def forward(self, f, unnormalize=True):
         '''
@@ -384,6 +390,7 @@ class InverseScatter(BaseOperator):
         Returns:
             uscat_pred_set - (batch_size, numTrans, numRec) predicted scattered fields, torch.Tensor, complex64
         '''
+        f = f.to(torch.float64)
         if unnormalize:
             f = self.unnormalize(f)
         # Linear inverse scattering
@@ -402,6 +409,74 @@ class InverseScatter(BaseOperator):
         uscat_pred_set = self.forward(pred)
         diff = uscat_pred_set - observation
         squared_diff = diff * diff.conj()
-        loss = torch.sum(squared_diff, dim=(1, 2)).to(torch.float32)
+        loss = torch.sum(squared_diff, dim=(1, 2)).to(torch.float64) # Use torch.float64 for numerical stability
         return loss
         
+    def compute_svd(self):
+        '''
+        Compute SVD of the forward operator A.
+        The SVD is computed once and cached for future use.
+        A = U @ diag(Sigma) @ V_t
+        Also compute A_inv as the pseudo-inverse of A.
+        '''
+        path = 'cache/inv-scatter_numT_{}_numR_{}'.format(self.numTrans, self.numRec)
+        if os.path.exists(path + '/matrix.pt'):
+            print('Loading SVD from cache.')
+            self.U = torch.load(os.path.join(path, 'U.pt'))
+            self.Sigma = torch.load(os.path.join(path, 'S.pt'))
+            self.V_t = torch.load(os.path.join(path, 'Vt.pt'))
+            self.A = torch.load(os.path.join(path, 'matrix.pt'))
+            if os.path.exists(path + '/matrix_inv.pt'):
+                self.A_inv = torch.load(os.path.join(path, 'matrix_inv.pt'))
+            else:
+                self.A_inv = torch.linalg.pinv(self.A)
+                torch.save(self.A_inv, os.path.join(path, 'matrix_inv.pt'))
+        else:
+            print('Computing SVD... This may take 10-20 minutes for the first time.')
+            T = self.uinc_dom_set[..., 0].flatten(0,1)
+            R = self.sensor_greens_function_set[..., 0].reshape(-1, self.numRec)
+            A = torch.cat([R.T@torch.conj(torch.diag(T[:,i])) for i in range(T.shape[-1])], dim=0) * self.dx * self.dy
+            A = torch.view_as_real(A).permute(0,2,1).flatten(0,1)
+            U, Sigma, V = torch.svd(A)
+            self.U = U
+            self.Sigma = Sigma
+            self.V_t = V.T
+            self.A = A
+            self.A_inv = torch.linalg.pinv(A)
+            os.makedirs(path, exist_ok=True)
+            torch.save(self.U, os.path.join(path, 'U.pt'))
+            torch.save(self.Sigma, os.path.join(path, 'S.pt'))
+            torch.save(self.V_t, os.path.join(path, 'Vt.pt'))
+            torch.save(self.A, os.path.join(path, 'matrix.pt'))
+            torch.save(self.A_inv, os.path.join(path, 'matrix_inv.pt'))
+
+    def Vt(self, x):
+        # Return V^Tx
+        # [B, 1, H, W] -> [B, num_Trans*num_Rec]
+        x = x.to(torch.float64)
+        return (self.V_t @ x.flatten(-3)[...,None]).squeeze(-1)
+    
+    def V(self, x):
+        # Return Vx
+        # [B, num_Trans*num_Rec] -> [B, 1, H, W]
+        return (self.V_t.T @ x[...,None].to(torch.float64)).reshape(-1, 1, self.Ny, self.Nx).to(torch.float32)
+    
+    def Ut(self, x):
+        # Return U^T x
+        # [B, num_Trans,num_Rec] (complex) -> [B, num_Trans*num_Rec]
+        x = torch.view_as_real(x)
+        return (self.U.T @ x.flatten(-3)[...,None]).squeeze(-1)
+    
+    def pseudo_inverse(self, x):
+        # Return A_inv x
+        return self.normalize((self.A_inv @ torch.view_as_real(x).flatten()).reshape(-1, self.Ny, self.Nx))
+
+    @property
+    def M(self):
+        # Return a mask for nonzero singular values, M = (Sigma > 1e-3)
+        return (self.Sigma.abs() > 1e-3).float()
+    
+    @property
+    def S(self):
+        # Return the singular values Sigma
+        return self.Sigma
