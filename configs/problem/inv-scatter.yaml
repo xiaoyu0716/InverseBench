@@ -23,6 +23,6 @@ data:
   id_list: 0-99
 
 evaluator:
-  _target_: eval.MRI
+  _target_: eval.InverseScatter
 
 exp_dir: exps/inference/inv-scatter-linear

@@ -35,12 +35,11 @@ class DDNM(Algo):
         """
         sigma = torch.as_tensor(sigma).to(x.device)
         d = model(x, sigma)
-        # print(d.min(), d.max())
         return (d - x) / sigma**2
     
     def pseudo_inverse(self, op, y):
         # Compute the pseudo-inverse of the operator op and outputs A^(-1)y = VS^{-1}MU^{-1}y
-        return op.V(op.M * op.Ut(y))
+        return op.V(op.M * op.Ut(y)/op.S)
     
     def projection(self, op, x):
         # Compute the projection of x onto the null space of the operator op
@@ -50,9 +49,9 @@ class DDNM(Algo):
     @torch.no_grad()
     def inference(self, observation, num_samples=1, **kwargs):
         device = self.forward_op.device
-        x = torch.randn(observation.shape[0], self.net.img_channels, self.net.img_resolution, self.net.img_resolution, device=device) * self.scheduler.sigma_max
+        x = torch.randn(num_samples, self.net.img_channels, self.net.img_resolution, self.net.img_resolution, device=device) * self.scheduler.sigma_max
         pbar = tqdm.trange(self.scheduler.num_steps)
-        sigma_y = self.forward_op.sigma_noise
+        sigma_y = max(self.forward_op.sigma_noise, 1e-4) # For numerical stability
         for step in pbar:
             L = min(self.L, step) # DDNM: L = 0
             sigma, sigma_L = self.scheduler.sigma_steps[step], self.scheduler.sigma_steps[step-L]

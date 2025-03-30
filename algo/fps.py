@@ -43,7 +43,7 @@ class FPS(Algo):
         # NOTE: This implementation transforms linear inverse problems to its equivalent form of inpainting in the space of SVD.
         device = self.forward_op.device
         
-        observation = observation / self.forward_op.unnorm_scale - self.forward_op.forward(self.forward_op.unnorm_shift * torch.ones(observation.shape[0], self.net.img_channels, self.net.img_resolution, self.net.img_resolution, device=device),unnormalize=False)
+        observation = observation / self.forward_op.unnorm_scale - self.forward_op.forward(self.forward_op.unnorm_shift * torch.ones(num_samples, self.net.img_channels, self.net.img_resolution, self.net.img_resolution, device=device),unnormalize=False)
 
         sigma_y = self.forward_op.sigma_noise / self.forward_op.unnorm_scale
         sigma_y = max(sigma_y, 1e-4)
@@ -51,7 +51,7 @@ class FPS(Algo):
         # 1. Generate y sequence (Algorithm 2)
         
         observations = []
-        z = torch.randn(observation.shape[0], *self.forward_op.M.shape, device=device) * self.scheduler.sigma_max
+        z = torch.randn(num_samples, *self.forward_op.M.shape, device=device) * self.scheduler.sigma_max
         y = self.forward_op.M * z
         observations.append(y * self.scheduler.scaling_steps[0])
         for k in range(self.scheduler.num_steps):

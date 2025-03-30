@@ -42,10 +42,10 @@ class MCG_diff(Algo):
     @torch.no_grad()
     def inference(self, observation, num_samples=1, **kwargs):
         device = self.forward_op.device
-        observation = observation / self.forward_op.unnorm_scale - self.forward_op.forward(self.forward_op.unnorm_shift * torch.ones(observation.shape[0], self.net.img_channels, self.net.img_resolution, self.net.img_resolution, device=device),unnormalize=False)
+        observation = observation / self.forward_op.unnorm_scale - self.forward_op.forward(self.forward_op.unnorm_shift * torch.ones(num_samples, self.net.img_channels, self.net.img_resolution, self.net.img_resolution, device=device),unnormalize=False)
 
         observation_t = self.forward_op.Ut(observation).unsqueeze(1).repeat(1, self.num_particles, 1) * (self.forward_op.M / self.forward_op.S)
-        z = torch.randn(observation.shape[0], self.num_particles, *self.forward_op.M.shape, device=device)
+        z = torch.randn(num_samples, self.num_particles, *self.forward_op.M.shape, device=device)
         x_t = self.scheduler.sigma_max * z * (1 - self.forward_op.M) + self.forward_op.M * self.scheduler.sigma_max * self.K(0) * z 
 
         pbar = tqdm.trange(self.scheduler.num_steps)

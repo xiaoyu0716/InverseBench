@@ -26,19 +26,26 @@ class DiffPIR(Algo):
             rho =  (2*self.lamb*self.sigma_n**2)/(sigma*self.scheduler.scaling_steps[step])**2
             if self.linear:
                 # Linear:
-                y = self.forward_op.V_complex(self.forward_op.S*self.forward_op.M * self.forward_op.Ut(observation)) + rho * x0
-                scale = (self.forward_op.S*self.forward_op.M)**2 + rho
-                x0hat = y / scale 
-                loss_scale = 0.0
+                if observation.dtype == torch.complex64 or observation.dtype == torch.complex128:
+                    observation = torch.view_as_real(observation)
+                x0 = self.forward_op.unnormalize(x0)
+                y = (self.forward_op.A.T @ observation.flatten(1)[...,None] + rho * x0.flatten(1)[...,None])
+                
+                H = torch.linalg.inv(self.forward_op.A.T @ self.forward_op.A + rho * torch.eye(self.forward_op.A.shape[-1], device=self.forward_op.A.device))
+                x0hat = H @ y
+                x0hat = x0hat.reshape_as(x0).float()
+                x0hat = self.forward_op.normalize(x0hat)
+                loss_scale = 0
             else:
                 # Nonlinear:
                 with torch.enable_grad():
                     grad, loss_scale = self.forward_op.gradient(x0, observation, return_loss=True)
 
                 x0hat = x0 - grad / rho
-
+            
             effect = (xt/self.scheduler.scaling_steps[step] - x0hat)/sigma
             xt = x0hat + (np.sqrt(self.xi)* torch.randn_like(xt) + np.sqrt(1-self.xi)*effect) * sigma_next
+
             if step < self.scheduler.num_steps-1:
                 xt *= self.scheduler.scaling_steps[step+1] 
             pbar.set_description(f'Iteration {step + 1}/{self.scheduler.num_steps}. Data fitting loss: {torch.sqrt(loss_scale)}')

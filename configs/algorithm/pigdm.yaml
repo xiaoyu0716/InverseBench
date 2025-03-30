@@ -7,7 +7,9 @@ method:
     sigma_min: 0.01
     schedule: 'sqrt'
     timestep: 'log'
-    # schedule: 'vp'
+      # schedule: 'vp'
     # timestep: 'vp'
     # scaling: 'vp'
+  eta: 0.2
+  noisy: True
 
