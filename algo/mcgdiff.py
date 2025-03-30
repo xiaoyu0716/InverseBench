@@ -4,6 +4,8 @@ from .base import Algo
 import numpy as np
 import wandb
 from utils.scheduler import Scheduler
+from utils.helper import has_svd
+
     
 class MCG_diff(Algo):
     def __init__(self, 
@@ -12,6 +14,7 @@ class MCG_diff(Algo):
                  scheduler_config,
                  num_particles):
         super(MCG_diff, self).__init__(net, forward_op)
+        assert has_svd(forward_op), "MCG_diff only works with linear forward operators, which can be decomposed via SVD"
         self.scheduler = Scheduler(**scheduler_config)
         self.num_particles = num_particles
 
