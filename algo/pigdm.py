@@ -3,6 +3,8 @@ import tqdm
 from .base import Algo
 import numpy as np
 from utils.scheduler import Scheduler
+from utils.helper import has_pseudo_inverse
+
     
 class PiGDM(Algo):
     def __init__(self, 
@@ -10,6 +12,7 @@ class PiGDM(Algo):
                  forward_op,
                  scheduler_config,):
         super(PiGDM, self).__init__(net, forward_op)
+        assert has_pseudo_inverse(forward_op), "PiGDM only works with problems with pseudo-inverse access"
         self.scheduler = Scheduler(**scheduler_config)
         self.sde = False
 

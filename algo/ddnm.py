@@ -4,7 +4,9 @@ from .base import Algo
 import numpy as np
 import wandb
 from utils.scheduler import Scheduler
+from utils.helper import has_svd
     
+
 class DDNM(Algo):
     def __init__(self, 
                  net,
@@ -13,6 +15,8 @@ class DDNM(Algo):
                  eta,
                  L):
         super(DDNM, self).__init__(net, forward_op)
+        assert has_svd(forward_op), "DDNM only works with linear forward operators, which can be decomposed via SVD"
+
         self.scheduler = Scheduler(**scheduler_config)
         self.eta = eta
         self.L = L

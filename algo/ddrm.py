@@ -4,6 +4,8 @@ from .base import Algo
 import numpy as np
 import wandb
 from utils.scheduler import Scheduler
+from utils.helper import has_svd
+
     
 class DDRM(Algo):
     def __init__(self, 
@@ -13,6 +15,7 @@ class DDRM(Algo):
                  eta,
                  eta_b):
         super(DDRM, self).__init__(net, forward_op)
+        assert has_svd(forward_op), "DDRM only works with linear forward operators, which can be decomposed via SVD"
         self.scheduler = Scheduler(**scheduler_config)
         self.eta = eta
         self.eta_b = eta_b

@@ -10,7 +10,7 @@ model:
   numRec: 360
   numTrans: 20
   sensorRadius: 1.6
-  sigma_noise: 0.0
+  sigma_noise: 0.0001
   unnorm_shift: 1.0
   unnorm_scale: 0.5
 

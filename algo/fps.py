@@ -4,7 +4,9 @@ from .base import Algo
 import numpy as np
 import wandb
 from utils.scheduler import Scheduler
+from utils.helper import has_svd
     
+
 class FPS(Algo):
     def __init__(self, 
                  net,
@@ -13,6 +15,8 @@ class FPS(Algo):
                  eta,
                  num_particles):
         super(FPS, self).__init__(net, forward_op)
+        assert has_svd(forward_op), "Current implementation of FPS only works with linear forward operators, which can be decomposed via SVD"
+
         self.scheduler = Scheduler(**scheduler_config)
         self.eta = eta
         self.num_particles = num_particles

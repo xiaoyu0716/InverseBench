@@ -2,7 +2,7 @@
 General helper functions. Mostly adapted from https://github.com/NVlabs/edm
 '''
 
-import os, sys
+import os
 import re
 import io
 import hashlib
@@ -21,6 +21,22 @@ import torch
 
 _cache_dir = 'cache'
 
+
+def has_svd(forward_op):
+    # Check if the forward operator can be decomposed via SVD
+    if hasattr(forward_op, 'U') and hasattr(forward_op, 'S') and hasattr(forward_op, 'Vt'):
+        return True
+    else:
+        return False
+
+
+def has_pseudo_inverse(forward_op):
+    # Check if the forward operator has a pseudo-inverse method
+    if hasattr(forward_op, 'pseudo_inverse'):
+        return True
+    else:
+        return False
+    
 
 @torch.no_grad()
 def update_ema(ema_model, model, decay=0.9999):
@@ -147,65 +163,6 @@ def create_logger(logging_dir, main_process=True):
         logger.addHandler(file_handler)
         
     return logger
-
-
-class Logger(object):
-    """Redirect stderr to stdout, optionally print stdout to a file, and optionally force flushing on both stdout and the file."""
-
-    def __init__(self, file_name: Optional[str] = None, file_mode: str = "w", should_flush: bool = True):
-        self.file = None
-
-        if file_name is not None:
-            self.file = open(file_name, file_mode)
-
-        self.should_flush = should_flush
-        self.stdout = sys.stdout
-        self.stderr = sys.stderr
-
-        sys.stdout = self
-        sys.stderr = self
-
-    def __enter__(self) -> "Logger":
-        return self
-
-    def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
-        self.close()
-
-    def write(self, text: Union[str, bytes]) -> None:
-        """Write text to stdout (and a file) and optionally flush."""
-        if isinstance(text, bytes):
-            text = text.decode()
-        if len(text) == 0: # workaround for a bug in VSCode debugger: sys.stdout.write(''); sys.stdout.flush() => crash
-            return
-
-        if self.file is not None:
-            self.file.write(text)
-
-        self.stdout.write(text)
-
-        if self.should_flush:
-            self.flush()
-
-    def flush(self) -> None:
-        """Flush written text to both stdout and a file, if open."""
-        if self.file is not None:
-            self.file.flush()
-
-        self.stdout.flush()
-
-    def close(self) -> None:
-        """Flush, close possible files, and remove stdout/stderr mirroring."""
-        self.flush()
-
-        # if using multiple loggers, prevent closing in wrong order
-        if sys.stdout is self:
-            sys.stdout = self.stdout
-        if sys.stderr is self:
-            sys.stderr = self.stderr
-
-        if self.file is not None:
-            self.file.close()
-            self.file = None
 
 # URL helpers
 # ------------------------------------------------------------------------------------------
