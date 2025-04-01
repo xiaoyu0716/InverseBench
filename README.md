@@ -14,7 +14,7 @@ Abstract: *Plug-and-play diffusion priors (PnPDP) have emerged as a promising re
 - We recommend Linux with 64-bit Python 3.11 for the best compatiblity.
 - At least one high-end GPU for inference. All our experiments were conducted on A100 GPUs. 
 - The main dependencies are `pytorch, scipy, hydra-core, lmdb, piq, wandb, accelerate, devito, dask, ehtim, ehtplot, h5py, sigpy, pynfft, pytest`. Note that `pynfft` is required for the black hole imaging task and is compatible only with `numpy 1.xx`.
-- We also provide [Dockerfile](Docker/Dockerfile) is provided under `Docker`, offering the best compatibility for all five tasks. It can be used as follows:
+- We also provide [Dockerfile](Docker/Dockerfile) under `Docker`, offering the best compatibility for all five tasks. It can be used as follows:
 ```bash
 # Build docker image
 docker build -t [image tag] --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) .
