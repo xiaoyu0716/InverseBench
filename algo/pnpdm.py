@@ -118,8 +118,7 @@ class PnPDM(Algo):
             sampler = DiffusionSampler(diffusion_scheduler)
             x = sampler.sample(self.net, z, SDE=True, verbose=False)
 
-            difference = observation - self.forward_op.forward(x)
-            norm = torch.linalg.norm(difference)
-            pbar.set_description(f'Iteration {step + 1}/{num_steps}. Avg. Error: {norm.abs().mean().cpu().item()}')
+            loss = self.forward_op.loss(x, observation)
+            pbar.set_description(f'Iteration {step + 1}/{num_steps}. Avg. Error: {loss.sqrt().mean().cpu().item()}')
         return x
 
