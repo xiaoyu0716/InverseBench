@@ -13,7 +13,8 @@ Abstract: *Plug-and-play diffusion priors (PnPDP) have emerged as a promising re
 ## Environment requirements
 - We recommend Linux with 64-bit Python 3.11 for the best compatiblity.
 - At least one high-end GPU for inference. All our experiments were conducted on A100 GPUs. 
-- The main dependencies are `pytorch, scipy, hydra-core, lmdb, piq, wandb, accelerate, devito, dask, ehtim, ehtplot, h5py, sigpy, pynfft, pytest`. Note that `pynfft` is required for the black hole imaging task and is compatible only with `numpy 1.xx`.
+- The main dependencies are `pytorch, scipy, hydra-core, lmdb, piq, wandb, accelerate, devito, dask, ehtim, ehtplot, h5py, sigpy, pynfft, pytest`. 
+- Note: `pynfft` is required for the black hole imaging task and is only compatible with `numpy 1.xx`. If you encounter numpy compatibility issues, a simple workaround is to create a separate conda environment for black hole imaging.([issue #3](https://github.com/devzhk/InverseBench/issues/3))
 - We also provide [Dockerfile](Docker/Dockerfile) under `Docker`, offering the best compatibility for all five tasks. It can be used as follows:
 ```bash
 # Build docker image
@@ -57,6 +58,8 @@ By default, `configs/config.yaml` will be loaded for inference. You can override
 ```bash
 python3 main.py problem=[inverse problem config name] algorithm=[algorithm config name] pretrain=[pretrained model config name]
 ```
+Note: The effective hyperparameter ranges for the same algorithm may vary significantly across different inverse problems. We recommend starting with the optimized hyperparameters provided in Table 12 of our paper as a reference point.
+
 The structure of the inference config is explained below. 
 | Key       | Description                                                                      |
 |-----------|----------------------------------------------------------------------------------|
