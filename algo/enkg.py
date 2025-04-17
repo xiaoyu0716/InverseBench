@@ -18,7 +18,8 @@ class EnKG(Algo):
                  threshold=0.1,
                  batch_size=128,
                  lr_min_ratio=0.0,
-                 rho=7):
+                 rho: int=7, 
+                 factor: int=4):
         super(EnKG, self).__init__(net, forward_op)
         self.rho = rho
         self.num_steps = num_steps
@@ -30,6 +31,7 @@ class EnKG(Algo):
         self.threshold = threshold
         self.num_samples = num_samples
         self.lr_min_ratio = lr_min_ratio
+        self.factor = factor
 
     @torch.no_grad()
     def inference(self, observation, num_samples=1):
@@ -63,7 +65,7 @@ class EnKG(Algo):
                 x_hat, t_hat = self.update_particles(
                     x_cur,
                     observation,
-                    num_steps=min(1 + (self.num_steps - i) // 4, 20),
+                    num_steps=min(1 + (self.num_steps - i) // self.factor, 20),
                     sigma_start=t_cur,
                     guidance_scale=self.get_lr(i),
                 )

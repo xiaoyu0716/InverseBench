@@ -10,4 +10,5 @@ method:
   threshold: 0.1
   batch_size: 64
   rho: 7
+  factor: 8
 
