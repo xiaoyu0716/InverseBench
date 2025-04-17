@@ -1,6 +1,6 @@
-# Dataset Card for SipBench
+# Dataset Card for InverseBench
 
-- [Dataset Card for SipBench](#dataset-card-for-sipbench)
+- [Dataset Card for InverseBench](#dataset-card-for-inversebench)
   - [Data for linear inverse scattering](#data-for-linear-inverse-scattering)
   - [Data for MRI](#data-for-mri)
   - [Data for black hole imaging](#data-for-black-hole-imaging)
@@ -80,7 +80,7 @@ We use one validation sample from the validation set to tune hyperparameters for
 
 | Data split | Number of entries | Statistics (min,max) |
 |------------|-------------------|----------------------|
-| Train      | 10,240            | (-10, 10)            |
+| Train      | 20,480            | (-10, 10)            |
 | Test       | 100               | (-10, 10)            |
 | Validation | 10                | (-10, 10)            |
 
