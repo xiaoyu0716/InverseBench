@@ -31,6 +31,7 @@ class BlackHoleImaging(BaseOperator):
         self.observation_time_ratio = observation_time_ratio
         self.noise_type = noise_type
         self.ttype = ttype  # 'fast' | 'nfft' | 'direct'
+        self.device = device
 
         # Get index  matrix for closure phases and closure amplitudes
         self.get_index_matrix(obs)
@@ -118,8 +119,8 @@ class BlackHoleImaging(BaseOperator):
             conj = [conjugate_fn[(time, t1, t2)], conjugate_fn[(time, t2, t3)], conjugate_fn[(time, t3, t1)]]
             cp_index.append(idx)
             cp_conjugate.append(conj)
-        self.cp_index = torch.tensor(cp_index).long().cuda()
-        self.cp_conjugate = torch.tensor(cp_conjugate).long().cuda()
+        self.cp_index = torch.tensor(cp_index).long().to(self.device)
+        self.cp_conjugate = torch.tensor(cp_conjugate).long().to(self.device)
 
         # log closure amplitude index
         camp_df = pd.DataFrame(obs.c_amplitudes(count='min'))
@@ -130,8 +131,8 @@ class BlackHoleImaging(BaseOperator):
                     conjugate_fn[(time, t2, t3)]]
             camp_index.append(idx)
             camp_conjugate.append(conj)
-        self.camp_index = torch.tensor(camp_index).long().cuda()
-        self.camp_conjugate = torch.tensor(camp_conjugate).long().cuda()
+        self.camp_index = torch.tensor(camp_index).long().to(self.device)
+        self.camp_conjugate = torch.tensor(camp_conjugate).long().to(self.device)
 
     # 1. visibility and flux from image x in range [0,1]
     def forward_vis(self, x):
