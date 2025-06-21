@@ -19,7 +19,7 @@ class BlackHoleImaging(BaseOperator):
         This class utilize a reference observation for observation setup (e.g. telescope u,v map)
     """
 
-    def __init__(self, root='dataset/blackhole', observation_time_ratio=1.0, noise_type='vis_thermal', imsize=64, w1=0,
+    def __init__(self, root='dataset/blackhole', observation_time_ratio=1.0, noise_type='vis_thermal', ttype='nfft', imsize=64, w1=0,
                  w2=1, w3=1, w4=0.5, sigma_noise=0.0, unnorm_shift=1.0, unnorm_scale=0.5, device='cuda'):
         super().__init__(sigma_noise, unnorm_shift, unnorm_scale, device)
         # load observations
@@ -30,6 +30,8 @@ class BlackHoleImaging(BaseOperator):
         self.ref_multiplier = multiplier
         self.observation_time_ratio = observation_time_ratio
         self.noise_type = noise_type
+        self.ttype = ttype  # 'fast' | 'nfft' | 'direct'
+        self.device = device
 
         # Get index  matrix for closure phases and closure amplitudes
         self.get_index_matrix(obs)
@@ -117,8 +119,8 @@ class BlackHoleImaging(BaseOperator):
             conj = [conjugate_fn[(time, t1, t2)], conjugate_fn[(time, t2, t3)], conjugate_fn[(time, t3, t1)]]
             cp_index.append(idx)
             cp_conjugate.append(conj)
-        self.cp_index = torch.tensor(cp_index).long().cuda()
-        self.cp_conjugate = torch.tensor(cp_conjugate).long().cuda()
+        self.cp_index = torch.tensor(cp_index).long().to(self.device)
+        self.cp_conjugate = torch.tensor(cp_conjugate).long().to(self.device)
 
         # log closure amplitude index
         camp_df = pd.DataFrame(obs.c_amplitudes(count='min'))
@@ -129,8 +131,8 @@ class BlackHoleImaging(BaseOperator):
                     conjugate_fn[(time, t2, t3)]]
             camp_index.append(idx)
             camp_conjugate.append(conj)
-        self.camp_index = torch.tensor(camp_index).long().cuda()
-        self.camp_conjugate = torch.tensor(camp_conjugate).long().cuda()
+        self.camp_index = torch.tensor(camp_index).long().to(self.device)
+        self.camp_conjugate = torch.tensor(camp_conjugate).long().to(self.device)
 
     # 1. visibility and flux from image x in range [0,1]
     def forward_vis(self, x):
@@ -296,7 +298,7 @@ class BlackHoleImaging(BaseOperator):
             eh_image.ivec = eh_image.ivec * multiplier
 
             # observe the image
-            obs = eh_image.observe_same_nonoise(ref_obs, verbose=False)
+            obs = eh_image.observe_same_nonoise(ref_obs, ttype=self.ttype, verbose=False)
 
             # visibilities amplitude
             adf = ehdf.make_amp(obs, debias=False)
@@ -401,7 +403,7 @@ class BlackHoleImaging(BaseOperator):
             eh_image.ivec = eh_image.ivec * multiplier
 
             # observe the image
-            obs = eh_image.observe_same(ref_obs, phasecal=False, ampcal=False, verbose=False)
+            obs = eh_image.observe_same(ref_obs, phasecal=False, ampcal=False, ttype=self.ttype, verbose=False)
             # eht_obs.append(obs)
 
             # visibilities amplitude
