@@ -20,10 +20,15 @@ class BlackHoleImaging(BaseOperator):
     """
 
     def __init__(self, root='dataset/blackhole', observation_time_ratio=1.0, noise_type='vis_thermal', ttype='nfft', imsize=64, w1=0,
-                 w2=1, w3=1, w4=0.5, sigma_noise=0.0, unnorm_shift=1.0, unnorm_scale=0.5, device='cuda'):
+                 w2=1, w3=1, w4=0.5, sigma_noise=0.0, unnorm_shift=1.0, unnorm_scale=0.5, ref_flux=None, device='cuda'):
         super().__init__(sigma_noise, unnorm_shift, unnorm_scale, device)
         # load observations
         A_vis, A_cp, A_camp, obs, im, multiplier, sigma = self.process_obs(root, imsize, observation_time_ratio)
+
+        if ref_flux is not None:
+          # rescale reference image to specified `ref_flux`
+          im.ivec *= ref_flux / np.sum(im.ivec)
+
         self.ref_im = im
         self.ref_flux = np.sum(self.ref_im.ivec)
         self.ref_obs = obs
