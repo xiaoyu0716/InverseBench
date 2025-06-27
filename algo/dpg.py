@@ -5,6 +5,11 @@ from utils.scheduler import Scheduler
 import numpy as np
 import wandb
 
+# -----------------------------------------------------------------------------------------------
+# Paper: Solving General Inverse Problems via Posterior Sampling: A Policy Gradient Viewpoint
+# Official implementation: https://github.com/loveisbasa/DPG
+# -----------------------------------------------------------------------------------------------
+
 
 class DPG(Algo):
     

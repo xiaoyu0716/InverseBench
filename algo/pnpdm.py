@@ -7,6 +7,11 @@ from utils.scheduler import Scheduler
 from utils.diffusion import DiffusionSampler
 import warnings
 
+# -------------------------------------------------------------------------------------------
+# Paper: Principled Probabilistic Imaging using Diffusion Models as Plug-and-Play Priors
+# Official implementation: https://github.com/zihuiwu/PnP-DM-public
+# -------------------------------------------------------------------------------------------
+
 
 def get_exponential_decay_scheduler(num_steps, sigma_max, sigma_min, rho=0.9):
     sigma_steps = []

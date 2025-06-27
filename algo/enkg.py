@@ -4,6 +4,10 @@ from .base import Algo
 
 import wandb
 
+# ----------------------------------------------------------------------------------------
+# Paper: Ensemble kalman diffusion guidance: A derivative-free method for inverse problems
+# Official implementation: https://github.com/devzhk/enkg-pytorch
+# ----------------------------------------------------------------------------------------
 
 class EnKG(Algo):
     def __init__(self, 

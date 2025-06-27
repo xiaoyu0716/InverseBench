@@ -3,6 +3,13 @@ import torch
 import numpy as np
 from .base import Algo
 
+# -------------------------------------------------------------------------------------------
+# Papers: Robust Compressed Sensing MRI with Deep Generative Priors, 
+#        Instance-Optimal Compressed Sensing via Posterior Sampling
+# Official implementation: https://github.com/utcsilab/csgm-mri-langevin
+# -------------------------------------------------------------------------------------------
+
+
 def get_sigmas(sigmas_config):
     if sigmas_config.sigma_dist == 'geometric':
         sigmas = np.exp(np.linspace(np.log(sigmas_config.sigma_begin), np.log(sigmas_config.sigma_end), sigmas_config.num_steps))
@@ -11,6 +18,7 @@ def get_sigmas(sigmas_config):
     else:
         raise NotImplementedError('sigma distribution not supported')
     return sigmas
+
 
 class CSGMMRI(Algo):
     def __init__(self, net, forward_op, sigmas_config, start_iter=1155, n_steps_each=3, step_lr=5e-5, mse=5):

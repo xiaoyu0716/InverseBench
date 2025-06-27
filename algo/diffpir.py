@@ -5,6 +5,11 @@ import numpy as np
 import wandb
 from utils.scheduler import Scheduler
 
+# -----------------------------------------------------------------------------------------------
+# Paper: Denoising Diffusion Models for Plug-and-Play Image Restoration
+# Official implementation: https://github.com/yuanzhi-zhu/DiffPIR
+# -----------------------------------------------------------------------------------------------
+
 
 class DiffPIR(Algo):
     def __init__(self, net, forward_op, diffusion_scheduler_config, sigma_n, lamb, xi, linear=False):

@@ -4,6 +4,10 @@ from .base import Algo
 from utils.scheduler import Scheduler
 import numpy as np
 
+# -----------------------------------------------------------------------------------------------------------------
+# This is a zero-order extension of DPS algorithm that uses Gaussian smoothed gradient estimation.
+# First introduced in the paper "Ensemble kalman diffusion guidance: A derivative-free method for inverse problems"
+# -----------------------------------------------------------------------------------------------------------------
 
 class DPS_GSG(Algo):
     '''

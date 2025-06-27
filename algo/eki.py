@@ -4,11 +4,12 @@ import torch
 
 from .base import Algo
 
-try: 
-    import wandb
-except ImportError:
-    wandb = None
+import wandb
 
+# -----------------------------------------------------------------------------------------------
+# Paper: Ensemble Kalman methods for inverse problems.
+# This implementation is based on the implemenation in https://github.com/devzhk/enkg-pytorch
+# -----------------------------------------------------------------------------------------------
 
 class GaussianRF2d(object):
     def __init__(self, s1, s2, 
@@ -68,13 +69,12 @@ class EKI(Algo):
                  num_samples=1024, 
                  resolution=128, 
                  L=2 * math.pi, 
-                 device=torch.device('cuda'), 
-                 use_wandb=False):
+                 device=torch.device('cuda')
+                 ):
         super().__init__(net, forward_op)
         self.guidance_scale = guidance_scale
         self.num_updates = num_updates
         self.num_samples = num_samples
-        self.use_wandb = use_wandb
 
         self.grf = GaussianRF2d(s1=resolution, s2=resolution, L1=L, L2=L, 
                                 alpha=4.0, tau=3.0, device=device)
@@ -101,7 +101,7 @@ class EKI(Algo):
             lr = self.guidance_scale / torch.linalg.matrix_norm(coef)
 
             x_next = x_next - lr * dxs.reshape(x_next.shape)
-            if self.use_wandb:
+            if wandb.run is not None:
                 abs_err = torch.abs(ys_err)
                 avg_err = torch.mean(abs_err)
                 max_err = torch.max(abs_err)

@@ -2,10 +2,13 @@ import torch
 import tqdm
 from .base import Algo
 import numpy as np
-import wandb
 from utils.scheduler import Scheduler
 from utils.helper import has_svd
-    
+
+# -----------------------------------------------------------------------------------------------
+# Paper: Diffusion Posterior Sampling for Linear Inverse Problem Solving: A Filtering Perspective
+# Official implementation: https://github.com/ZehaoDou-official/FPS-SMC-2023
+# -----------------------------------------------------------------------------------------------
 
 class FPS(Algo):
     def __init__(self, 

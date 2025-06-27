@@ -6,6 +6,11 @@ import wandb
 from utils.scheduler import Scheduler
 
 
+# -------------------------------------------------------------------------------------------
+# Paper: A Variational Perspective on Solving Inverse Problems with Diffusion Models
+# Official implementation: https://github.com/NVlabs/RED-diff
+# -------------------------------------------------------------------------------------------
+
 class REDDiff(Algo):
     def __init__(self, net, forward_op, num_steps=1000, observation_weight=1.0, base_lambda=0.25, base_lr=0.5, lambda_scheduling_type='constant'):
         super(REDDiff, self).__init__(net, forward_op)

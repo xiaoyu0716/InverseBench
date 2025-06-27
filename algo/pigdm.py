@@ -5,6 +5,10 @@ import numpy as np
 from utils.scheduler import Scheduler
 from utils.helper import has_pseudo_inverse
 
+# ----------------------------------------------------------------------------------------------
+# Paper: Pseudoinverse-Guided Diffusion Models for Inverse Problems
+# No official implementation available. This implementation is based on the paper's description.
+# ----------------------------------------------------------------------------------------------
     
 class PiGDM(Algo):
     def __init__(self, 

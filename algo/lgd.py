@@ -6,6 +6,10 @@ import numpy as np
 
 import wandb
 
+# -----------------------------------------------------------------------------------------------
+# Paper: Loss-Guided Diffusion Models for Plug-and-Play Controllable Generation
+# No official implementation available. This implementation is based on the paper's description. 
+# -----------------------------------------------------------------------------------------------
 
 class LGD(Algo):
     def __init__(self,

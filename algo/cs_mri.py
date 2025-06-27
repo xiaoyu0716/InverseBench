@@ -3,6 +3,7 @@ import numpy as np
 from .base import Algo
 from sigpy.mri import app
 
+
 class CompressedSensingMRI(Algo):
     def __init__(self, net, forward_op, mode, lamda):
         super(CompressedSensingMRI, self).__init__(net, forward_op)

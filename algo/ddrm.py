@@ -2,10 +2,15 @@ import torch
 import tqdm
 from .base import Algo
 import numpy as np
-import wandb
 from utils.scheduler import Scheduler
 from utils.helper import has_svd
     
+# ----------------------------------------------------------------------------------
+# Paper: Denoising Diffusion Restoration Models
+# Official implementation: https://github.com/bahjat-kawar/ddrm
+# ----------------------------------------------------------------------------------
+
+
 class DDRM(Algo):
     def __init__(self, 
                  net,

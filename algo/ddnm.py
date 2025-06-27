@@ -2,10 +2,13 @@ import torch
 import tqdm
 from .base import Algo
 import numpy as np
-import wandb
 from utils.scheduler import Scheduler
 from utils.helper import has_svd
     
+# -------------------------------------------------------------------------------
+# Paper: Zero-Shot Image Restoration Using Denoising Diffusion Null-Space Model
+# Official implementation: https://github.com/wyhuai/DDNM
+# -------------------------------------------------------------------------------
 
 class DDNM(Algo):
     def __init__(self, 

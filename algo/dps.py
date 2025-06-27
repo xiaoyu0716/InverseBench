@@ -4,6 +4,11 @@ from .base import Algo
 from utils.scheduler import Scheduler
 import numpy as np
 
+# -----------------------------------------------------------------------------------------------
+# Paper: Diffusion Posterior Sampling for General Noisy Inverse Problems
+# Official implementation: https://github.com/DPS2022/diffusion-posterior-sampling
+# -----------------------------------------------------------------------------------------------
+
 
 class DPS(Algo):
     

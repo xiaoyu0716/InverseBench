@@ -4,12 +4,12 @@ from .base import Algo
 from utils.scheduler import Scheduler
 import numpy as np
 
+# -----------------------------------------------------------------------------------------------
+# Paper: Symbolic Music Generation with Non-Differentiable Rule Guided Diffusion
+# Official implementation: https://github.com/yjhuangcd/rule-guided-music
+# -----------------------------------------------------------------------------------------------
 
 class SCG(Algo):
-    '''
-    Stochastic Control Guidance algorithm proposed by 
-    Huang, Yujia, et al. "Symbolic Music Generation with Non-Differentiable Rule Guided Diffusion." 
-    '''
     def __init__(self, 
                  net,
                  forward_op,
