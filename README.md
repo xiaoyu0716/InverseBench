@@ -30,7 +30,7 @@ Breakdown of the `docker run` command:
 
 ## Pre-trained models
 
-Pre-trained model weights can be found in the GitHub release page.
+Pre-trained model weights can be found in the [GitHub release](https://github.com/devzhk/InverseBench/releases/tag/diffusion-prior) page.
 
 | Problem  | Pretrained diffusion model| Training config |
 |---------|---------------------------| ------------- |
