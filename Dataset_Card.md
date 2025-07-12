@@ -8,7 +8,7 @@
   - [Data for Navier-Stokes equation](#data-for-navier-stokes-equation)
   - [Acknowledgement](#acknowledgement)
 
-Our data can be downloaded from [CaltechData]([https://data.caltech.edu/records/jfdr4-6ws87?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjdiNDk4OGU3LWQ0NTgtNGYwNy04NDc4LWE5YWE3OWIzOTU0MSIsImRhdGEiOnt9LCJyYW5kb20iOiJlYTk1ZjU0YTdmZjcwZTQ1OTYzZTNiZTRkNTBhYmJmMiJ9.NFEYlpOyrepCIFkR6EBrVaQcGGfVam5gileyMjbnrjBCZFemXLsGyGY-qlxlPf9tGE_L1qH3lCpUJz_RTeOfiQ](https://data.caltech.edu/records/zg89b-mpv16)).
+Our data can be downloaded from [CaltechData](https://data.caltech.edu/records/zg89b-mpv16).
 
 ## Data for linear inverse scattering
 - Generated using the online simulator [CytoPacq](https://cbia.fi.muni.cz/simulator/index.php)[1]. 
